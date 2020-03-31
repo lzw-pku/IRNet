@@ -52,8 +52,8 @@ class AuxiliaryPointerNet(nn.Module):
         if src_token_mask is not None:
             # (tgt_action_num, batch_size, src_sent_len)
             src_token_mask = src_token_mask.unsqueeze(0).expand_as(weights)
-            weights.data.masked_fill_(src_token_mask.bool(), -float('inf'))
-            context_weights.data.masked_fill_(src_token_mask.bool(), -float('inf'))
+            weights.data.masked_fill_(src_token_mask == 1, -float('inf'))
+            context_weights.data.masked_fill_(src_token_mask == 1, -float('inf'))
 
         sigma = 0.1
         return weights.squeeze(0) + sigma * context_weights.squeeze(0)
@@ -109,7 +109,7 @@ class PointerNet(nn.Module):
         if src_token_mask is not None:
             # (tgt_action_num, batch_size, src_sent_len)
             src_token_mask = src_token_mask.unsqueeze(0).expand_as(weights)
-            weights.data.masked_fill_(src_token_mask.bool(), -float('inf'))
+            weights.data.masked_fill_(src_token_mask == 1, -float('inf'))
 
         return weights.squeeze(0)
 
@@ -128,5 +128,5 @@ class PointerNet(nn.Module):
         V = self.V.unsqueeze(0).expand(src_encodings.size(0), -1).unsqueeze(1)
         att = torch.bmm(V, self.tanh(inp + ctx + col_choice_pre_type)).squeeze(1)
         if src_token_mask is not None:
-            att.data.masked_fill_(src_token_mask.bool(), -float('inf'))
+            att.data.masked_fill_(src_token_mask == 1, -float('inf'))
         return att

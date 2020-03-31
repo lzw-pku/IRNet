@@ -437,7 +437,7 @@ class Seq2Tree(nn.Module):
                 weights = self.column_pointer_net(src_encodings=table_encoding, query_vec=att_t.unsqueeze(0),
                                                   src_token_mask=batch.table_token_mask)
             # weights = self.column_pointer_net(src_encodings=table_embedding, query_vec=att_t.unsqueeze(0), src_token_mask=batch.table_token_mask)
-            weights.data.masked_fill_(batch.table_token_mask.bool(), -float('inf'))
+            weights.data.masked_fill_(batch.table_token_mask == 1, -float('inf'))
             # weights.data.masked_fill_(col_pred_mask.bool(), -float('inf'))
 
             column_attention_weights = F.softmax(weights, dim=-1)
@@ -447,10 +447,10 @@ class Seq2Tree(nn.Module):
             # table_weights = self.table_pointer_net(src_encodings=schema_embedding, query_vec=att_t.unsqueeze(0), src_token_mask=None)
 
             schema_token_mask = batch.schema_token_mask.expand_as(table_weights)
-            table_weights.data.masked_fill_(schema_token_mask.bool(), -float('inf'))
+            table_weights.data.masked_fill_(schema_token_mask == 1, -float('inf'))
             table_dict = [batch_table_dict[x_id][int(x)] for x_id, x in enumerate(table_enable.tolist())]
             table_mask = batch.table_dict_mask(table_dict)
-            table_weights.data.masked_fill_(table_mask.bool(), -float('inf'))
+            table_weights.data.masked_fill_(table_mask == 1, -float('inf'))
 
             table_weights = F.softmax(table_weights, dim=-1)
 
@@ -824,11 +824,11 @@ class Seq2Tree(nn.Module):
                                                    src_token_mask=None)
 
             schema_token_mask = batch.schema_token_mask.expand_as(table_weights)
-            table_weights.data.masked_fill_(schema_token_mask.bool(), -float('inf'))
+            table_weights.data.masked_fill_(schema_token_mask == 1, -float('inf'))
 
             table_dict = [batch_table_dict[0][int(x)] for x_id, x in enumerate(table_enable.tolist())]
             table_mask = batch.table_dict_mask(table_dict)
-            table_weights.data.masked_fill_(table_mask.bool(), -float('inf'))
+            table_weights.data.masked_fill_(table_mask == 1, -float('inf'))
 
             table_weights = F.log_softmax(table_weights, dim=-1)
 
@@ -946,7 +946,7 @@ class Seq2Tree(nn.Module):
         _lengths, perm_index = sketch_length.sort(0, descending=True)
         _, initial_index = perm_index.sort(0, descending=False)
         sketch_rule_embeds = self.production_embed(sketch_vars)
-        sketch_rule_embeds.masked_fill_(sketch_len_mask.unsqueeze(2).repeat(1, 1, sketch_rule_embeds.shape[-1]).bool(), 0.0)
+        sketch_rule_embeds.masked_fill_(sketch_len_mask.unsqueeze(2).repeat(1, 1, sketch_rule_embeds.shape[-1]) == 1, 0.0)
         _embeds = sketch_rule_embeds[perm_index]
         packed_src_token_embed = pack_padded_sequence(_embeds, list(_lengths.data), batch_first=True)
         sketch_encodings, _ = self.sketch_encoder(packed_src_token_embed)
