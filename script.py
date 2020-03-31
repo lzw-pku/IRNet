@@ -5,6 +5,12 @@ with open('data/tables.json') as f:
     table = json.load(f)
 with open('data/train.json') as f:
     semql = json.load(f)
+
+
+d = data[0]
+print(d)
+exit(0)
+
 for t in table:
     if t['db_id'] == 'college_1':
         print(t)
