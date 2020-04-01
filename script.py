@@ -7,8 +7,10 @@ with open('data/train.json') as f:
     semql = json.load(f)
 
 
-d = data[0]
-print(d)
+d = semql[0]
+for k, v in d.items():
+    print(k, v)
+#print(d)
 exit(0)
 
 for t in table:

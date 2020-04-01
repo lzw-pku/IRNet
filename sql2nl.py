@@ -320,11 +320,22 @@ def parse_sql_tree(tree_statements):
                 break
     return root, max_depth
 
-
+from sqlrefactor import *
 def sem2nl(sql_tree):
+
     root, max_depth = parse_sql_tree(sql_tree)
     #Node.print_subtree(root)
     restatement = root.restatement_with_tag()
+    #print(restatement[0])
+    sql_tree = refactor(root, ['Filter', 'Select', 'Intersect'])
+    if len(sql_tree) > 1:
+        for root in sql_tree:
+            print(root.restatement_with_tag())
+        print('*'*80)
+    #print(sql_tree)
+    restatement = sql_tree[0].restatement_with_tag()
+    #print(restatement[0])
+    #exit(0)
     return restatement[0]
     #print(restatement[0])
 
@@ -357,10 +368,14 @@ if __name__ == '__main__':
         table = json.load(f)
     table = {t['db_id']: t for t in table}
     total = 0
-    for d in data:
+    for d in data[35:]:
         if 'JOIN' in d['query']:continue
         total += 1
-        if total == 100:exit(0)
+
+        if total == 16:exit(0)
+        #continue
+
+
         #print('!!')
         #try:
         rules = d['rule_label']
@@ -386,7 +401,8 @@ if __name__ == '__main__':
                 prod = f'{nt} -> {d["table_names"][obj.id_c]}'
             actions.append(prod)
         #print(actions)
-        print(d['query'], question, sem2nl(actions))
+        print(d['query'], question)
+        sem2nl(actions)
         #print()
         #print(rules)
         #print()
