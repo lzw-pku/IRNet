@@ -5,7 +5,7 @@
 data
 preprocess
 nohup*
-saved_model
+saved_model*
 # User-specific files
 *.suo
 *.user
