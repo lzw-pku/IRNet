@@ -373,7 +373,7 @@ if __name__ == '__main__':
     args = arg_parser.parse_args()
     args.data_path = '../data/new_process_data.json'
     args.table_path = '../data/tables.json'
-    args.output = '../data/new_data.json'
+    args.output = '../data/new_train.json'
     parser = Parser()
 
     # loading dataSets
