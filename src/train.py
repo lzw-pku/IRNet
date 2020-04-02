@@ -309,10 +309,10 @@ def train(args):
                         train_sql_data = partitioned_data[idx]
 
                 epoch_begin = time.time()
-                import pickle
-                with open('train_data.pkl', 'wb') as f:
-                    pickle.dump(train_sql_data, f)
-                exit(0)
+                #import pickle
+                #with open('train_data.pkl', 'wb') as f:
+                #    pickle.dump(train_sql_data, f)
+                #exit(0)
                 loss = epoch_train(model, optimizer, batch_size, train_sql_data, table_data, schemas, args,
                                    is_sketch=is_sketch,
                                    has_pos_tags=pos_tags is not None,

@@ -371,9 +371,9 @@ if __name__ == '__main__':
     arg_parser.add_argument('--table_path', type=str, help='table dataset')
     arg_parser.add_argument('--output', type=str, help='output data')
     args = arg_parser.parse_args()
-    args.data_path = '../data/new_process_data.json'
-    args.table_path = '../data/tables.json'
-    args.output = '../data/new_train.json'
+    #args.data_path = '../data/new_process_data.json'
+    #args.table_path = '../data/tables.json'
+    #args.output = '../data/new_train.json'
     parser = Parser()
 
     # loading dataSets
