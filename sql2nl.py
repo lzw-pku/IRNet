@@ -368,19 +368,10 @@ if __name__ == '__main__':
         table = json.load(f)
     table = {t['db_id']: t for t in table}
     total = 0
-    for d in data[35:]:
+    for d in data:
         if 'JOIN' in d['query']:continue
-        total += 1
 
-        if total == 16:exit(0)
-        #continue
-
-
-        #print('!!')
-        #try:
         rules = d['rule_label']
-        #if len(rules.split()) <= 40:
-        #    continue
         question = d['question']
         db_id = d['db_id']
         db = table[db_id]
@@ -388,9 +379,8 @@ if __name__ == '__main__':
         actions = []
         for rule in rules.split():
             nt = rule.split('(')[0]
-            #num = int(rule[-2])
             obj = eval(rule)
-            prod = obj.production#.grammar_dict[num]
+            prod = obj.production
             prod = [nt_map[p] if p in nt_map.keys() else p for p in prod.split()[1:]]
             prod = f'{nt_map[nt]} -> {" ".join(prod)}'
             if nt == 'A':
@@ -400,33 +390,6 @@ if __name__ == '__main__':
             elif nt == 'T':
                 prod = f'{nt} -> {d["table_names"][obj.id_c]}'
             actions.append(prod)
-        #print(actions)
-        print(d['query'], question)
-        sem2nl(actions)
-        #print()
-        #print(rules)
-        #print()
-        #exit(0)
-
-        #except:
-        #    pass
-
-
-'''
-
-SELECT T1.stu_fname
-FROM
-    student AS T1 JOIN enroll AS T2 ON T1.stu_num  =  T2.stu_num
-    JOIN CLASS AS T3 ON T2.class_code  =  T3.class_code
-    JOIN course AS T4 ON T3.crs_code  =  T4.crs_code
-    JOIN department AS T5 ON T5.dept_code  =  T4.dept_code
-WHERE T5.dept_name  =  'Accounting'
-INTERSECT SELECT
-    T1.stu_fname
-FROM
-    student AS T1 JOIN enroll AS T2 ON T1.stu_num  =  T2.stu_num
-    JOIN CLASS AS T3 ON T2.class_code  =  T3.class_code
-    JOIN course AS T4 ON T3.crs_code  =  T4.crs_code
-    JOIN department AS T5 ON T5.dept_code  =  T4.dept_code
-WHERE T5.dept_name  =  'Computer Info. Systems'
-'''
+        if sem2nl(actions):
+            total += 1
+    print(total, len(data))
