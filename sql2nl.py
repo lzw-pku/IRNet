@@ -324,19 +324,22 @@ from sqlrefactor import *
 def sem2nl(sql_tree):
 
     root, max_depth = parse_sql_tree(sql_tree)
-    #Node.print_subtree(root)
-    restatement = root.restatement_with_tag()
-    #print(restatement[0])
+
     sql_tree = refactor(root, ['Filter', 'Select', 'Intersect'])
-    if len(sql_tree) > 1:
-        for root in sql_tree:
-            print(root.restatement_with_tag())
-        print('*'*80)
+    #sql_tree = refactor(root, ['Intersect'])
+    #assert len(sql_tree) >= 1
+    #return len(sql_tree) > 1
+    #if len(sql_tree) > 1:
+    #    pass
+        #for root in sql_tree:
+        #    print(root.restatement_with_tag())
+        #print('*'*80)
     #print(sql_tree)
-    restatement = sql_tree[0].restatement_with_tag()
+    #restatement = sql_tree[0].restatement_with_tag()
     #print(restatement[0])
     #exit(0)
-    return restatement[0]
+    restatement = [root.restatement_with_tag() for root in sql_tree]
+    return restatement
     #print(restatement[0])
 
 
@@ -368,9 +371,11 @@ if __name__ == '__main__':
         table = json.load(f)
     table = {t['db_id']: t for t in table}
     total = 0
-    for d in data:
+    for i, d in enumerate(data):
         if 'JOIN' in d['query']:continue
-
+        #total += 1
+        #print(i, total)
+        #continue
         rules = d['rule_label']
         question = d['question']
         db_id = d['db_id']
@@ -390,6 +395,16 @@ if __name__ == '__main__':
             elif nt == 'T':
                 prod = f'{nt} -> {d["table_names"][obj.id_c]}'
             actions.append(prod)
-        if sem2nl(actions):
-            total += 1
+        #if sem2nl(actions):
+        #    total += 1
+        #print(i, total)
+        d['generate'] = sem2nl(actions)
+    data = list(filter(lambda x: 'generate' in x.keys(), data))
+    import pickle
+    with open('generate_data.pkl', 'wb') as f:
+        pickle.dump(data, f)
     print(total, len(data))
+
+
+
+# total:4731   Filter: 404    Select: 1253   Intersect: 103     1702
