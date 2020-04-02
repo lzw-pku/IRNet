@@ -398,7 +398,19 @@ if __name__ == '__main__':
         #if sem2nl(actions):
         #    total += 1
         #print(i, total)
-        d['generate'] = sem2nl(actions)
+        #d['generate'] = sem2nl(actions)
+        tmp = sem2nl(actions)
+        data = []
+        for nl in tmp:
+            question = nl[0]
+            question_toks = nl[0].split()
+            d = {'question': question, 'question_toks': question_toks, 'db_id': d['db_id'],
+                 'query': d['query'], 'query_toks': d['query_toks'], 'query_toks_no_value': d['query_toks_no_value'],
+                 'sql': d['sql']}
+            data.append(d)
+        with open('new_train.json', 'w') as f:
+            json.dump(data, f)
+        exit(0)
     data = list(filter(lambda x: 'generate' in x.keys(), data))
     import pickle
     with open('generate_data.pkl', 'wb') as f:

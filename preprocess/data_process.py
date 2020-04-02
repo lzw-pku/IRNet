@@ -209,7 +209,7 @@ if __name__ == '__main__':
 
     # loading dataSets
     datas, table = load_dataSets(args)
-
+    #print(datas[])
     # process datasets
     process_result = process_datas(datas, args)
 

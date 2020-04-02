@@ -40,7 +40,7 @@ class Parser:
         if sql['sql']['limit'] == None:
             use_sup = False
 
-        if sql['sql']['orderBy'] == []:
+        if sql['sql']['orderby'] == []:
             use_ord = False
         elif sql['sql']['limit'] != None:
             use_ord = False
@@ -137,18 +137,18 @@ class Parser:
         select = sql['sql']['select'][1]
         if sql['sql']['limit'] == None:
             return result, None
-        if sql['sql']['orderBy'][0] == 'desc':
+        if sql['sql']['orderby'][0] == 'desc':
             result.append(Sup(0))
         else:
             result.append(Sup(1))
 
-        result.append(A(sql['sql']['orderBy'][1][0][1][0]))
-        self.colSet.add(sql['col_set'].index(sql['names'][sql['sql']['orderBy'][1][0][1][1]]))
-        result.append(C(sql['col_set'].index(sql['names'][sql['sql']['orderBy'][1][0][1][1]])))
-        if sql['sql']['orderBy'][1][0][1][1] == 0:
+        result.append(A(sql['sql']['orderby'][1][0][1][0]))
+        self.colSet.add(sql['col_set'].index(sql['names'][sql['sql']['orderby'][1][0][1][1]]))
+        result.append(C(sql['col_set'].index(sql['names'][sql['sql']['orderby'][1][0][1][1]])))
+        if sql['sql']['orderby'][1][0][1][1] == 0:
             result.append(self._parser_column0(sql, select))
         else:
-            result.append(T(sql['col_table'][sql['sql']['orderBy'][1][0][1][1]]))
+            result.append(T(sql['col_table'][sql['sql']['orderby'][1][0][1][1]]))
         return result, None
 
     def _parse_filter(self, sql):
@@ -219,21 +219,21 @@ class Parser:
         elif 'limit' in sql['query_toks_no_value']:
             return result, None
         else:
-            if sql['sql']['orderBy'] == []:
+            if sql['sql']['orderby'] == []:
                 return result, None
             else:
                 select = sql['sql']['select'][1]
-                if sql['sql']['orderBy'][0] == 'desc':
+                if sql['sql']['orderby'][0] == 'desc':
                     result.append(Order(0))
                 else:
                     result.append(Order(1))
-                result.append(A(sql['sql']['orderBy'][1][0][1][0]))
-                self.colSet.add(sql['col_set'].index(sql['names'][sql['sql']['orderBy'][1][0][1][1]]))
-                result.append(C(sql['col_set'].index(sql['names'][sql['sql']['orderBy'][1][0][1][1]])))
-                if sql['sql']['orderBy'][1][0][1][1] == 0:
+                result.append(A(sql['sql']['orderby'][1][0][1][0]))
+                self.colSet.add(sql['col_set'].index(sql['names'][sql['sql']['orderby'][1][0][1][1]]))
+                result.append(C(sql['col_set'].index(sql['names'][sql['sql']['orderby'][1][0][1][1]])))
+                if sql['sql']['orderby'][1][0][1][1] == 0:
                     result.append(self._parser_column0(sql, select))
                 else:
-                    result.append(T(sql['col_table'][sql['sql']['orderBy'][1][0][1][1]]))
+                    result.append(T(sql['col_table'][sql['sql']['orderby'][1][0][1][1]]))
         return result, None
 
 
@@ -367,15 +367,18 @@ class Parser:
 
 if __name__ == '__main__':
     arg_parser = argparse.ArgumentParser()
-    arg_parser.add_argument('--data_path', type=str, help='dataset', required=True)
-    arg_parser.add_argument('--table_path', type=str, help='table dataset', required=True)
-    arg_parser.add_argument('--output', type=str, help='output data', required=True)
+    arg_parser.add_argument('--data_path', type=str, help='dataset')
+    arg_parser.add_argument('--table_path', type=str, help='table dataset')
+    arg_parser.add_argument('--output', type=str, help='output data')
     args = arg_parser.parse_args()
-
+    args.data_path = '../data/new_process_data.json'
+    args.table_path = '../data/tables.json'
+    args.output = '../data/new_data.json'
     parser = Parser()
 
     # loading dataSets
     datas, table = load_dataSets(args)
+    print(list(sorted(datas[0].keys())))
     processed_data = []
 
     for i, d in enumerate(datas):
@@ -384,7 +387,8 @@ if __name__ == '__main__':
         r = parser.full_parse(datas[i])
         datas[i]['rule_label'] = " ".join([str(x) for x in r])
         processed_data.append(datas[i])
-
+    print(list(sorted(processed_data[0].keys())))
+    print(processed_data[0]['rule_label'])
     print('Finished %s datas and failed %s datas' % (len(processed_data), len(datas) - len(processed_data)))
     with open(args.output, 'w', encoding='utf8') as f:
         f.write(json.dumps(processed_data))
