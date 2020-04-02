@@ -40,7 +40,7 @@ class Parser:
         if sql['sql']['limit'] == None:
             use_sup = False
 
-        if sql['sql']['orderby'] == []:
+        if sql['sql']['orderBy'] == []:
             use_ord = False
         elif sql['sql']['limit'] != None:
             use_ord = False
@@ -137,18 +137,18 @@ class Parser:
         select = sql['sql']['select'][1]
         if sql['sql']['limit'] == None:
             return result, None
-        if sql['sql']['orderby'][0] == 'desc':
+        if sql['sql']['orderBy'][0] == 'desc':
             result.append(Sup(0))
         else:
             result.append(Sup(1))
 
-        result.append(A(sql['sql']['orderby'][1][0][1][0]))
-        self.colSet.add(sql['col_set'].index(sql['names'][sql['sql']['orderby'][1][0][1][1]]))
-        result.append(C(sql['col_set'].index(sql['names'][sql['sql']['orderby'][1][0][1][1]])))
-        if sql['sql']['orderby'][1][0][1][1] == 0:
+        result.append(A(sql['sql']['orderBy'][1][0][1][0]))
+        self.colSet.add(sql['col_set'].index(sql['names'][sql['sql']['orderBy'][1][0][1][1]]))
+        result.append(C(sql['col_set'].index(sql['names'][sql['sql']['orderBy'][1][0][1][1]])))
+        if sql['sql']['orderBy'][1][0][1][1] == 0:
             result.append(self._parser_column0(sql, select))
         else:
-            result.append(T(sql['col_table'][sql['sql']['orderby'][1][0][1][1]]))
+            result.append(T(sql['col_table'][sql['sql']['orderBy'][1][0][1][1]]))
         return result, None
 
     def _parse_filter(self, sql):
@@ -219,21 +219,21 @@ class Parser:
         elif 'limit' in sql['query_toks_no_value']:
             return result, None
         else:
-            if sql['sql']['orderby'] == []:
+            if sql['sql']['orderBy'] == []:
                 return result, None
             else:
                 select = sql['sql']['select'][1]
-                if sql['sql']['orderby'][0] == 'desc':
+                if sql['sql']['orderBy'][0] == 'desc':
                     result.append(Order(0))
                 else:
                     result.append(Order(1))
-                result.append(A(sql['sql']['orderby'][1][0][1][0]))
-                self.colSet.add(sql['col_set'].index(sql['names'][sql['sql']['orderby'][1][0][1][1]]))
-                result.append(C(sql['col_set'].index(sql['names'][sql['sql']['orderby'][1][0][1][1]])))
-                if sql['sql']['orderby'][1][0][1][1] == 0:
+                result.append(A(sql['sql']['orderBy'][1][0][1][0]))
+                self.colSet.add(sql['col_set'].index(sql['names'][sql['sql']['orderBy'][1][0][1][1]]))
+                result.append(C(sql['col_set'].index(sql['names'][sql['sql']['orderBy'][1][0][1][1]])))
+                if sql['sql']['orderBy'][1][0][1][1] == 0:
                     result.append(self._parser_column0(sql, select))
                 else:
-                    result.append(T(sql['col_table'][sql['sql']['orderby'][1][0][1][1]]))
+                    result.append(T(sql['col_table'][sql['sql']['orderBy'][1][0][1][1]]))
         return result, None
 
 
