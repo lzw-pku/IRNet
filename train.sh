@@ -3,7 +3,7 @@
 devices=$1
 save_name=$2
 
-CUDA_VISIBLE_DEVICES=$devices python ./src/train.py --dataset ./data/ \
+CUDA_VISIBLE_DEVICES=$devices python3 -u ./src/train.py --dataset ./data/ \
 --cuda \
 --epoch 60 \
 --beam_size 2 \
