@@ -218,7 +218,7 @@ class Node:
                     restatement_tag.append(node.text)
             return restatement_string, restatement_tag
         else:
-            return ' '.join(node_statement.split('_')) if node_statement is not '*' else 'items', None
+            return ' '.join(node_statement.split('_')) if node_statement is not '*' else 'items', None#[node_statement]
         # todo: tag of table and column with split char
 
     @staticmethod
@@ -276,7 +276,57 @@ class Node:
         root, _ = parse_sql_tree(statements)
         return root
 
+    def get_action(self):
+        state_map = ['intersect Root Root', 'union Root Root',
+                     'except Root Root', 'Root']
+        root_map = ['Select Sup Filter', 'Select Filter Order',
+                    'Select Sup', 'Select Filter',
+                    'Select Order', 'Select']
+        filter_map = ['and Filter Filter', 'or Filter Filter',
+                      '= A', '!= A', '< A', '> A', '<= A', '>= A',
+                     'between A', 'like A', 'not_like A',
+                      '= A Root', '< A Root', '> A Root', '!= A Root',
+                      'between A Root', '>= A Root', '<= A Root',
+                      'in A Root', 'not_in A Root']
+        sup_map = order_map = ['des A', 'asc A']
+        a_map = ['none C T', 'max C T', 'min C T', 'count C T',
+                 'sum C T', 'avg C T']
+        childern_text = ' '.join([c.text if isinstance(c, Node) else c for c in self.children])
+        if self.text == 'SQL':
+            act = []
+        elif self.text == 'Statement':
+            act = [f'Root1({state_map.index(childern_text)})']
+        elif self.text == 'Root':
+            act = [f'Root({root_map.index(childern_text)})']
+        elif self.text == 'N':
+            act = [f'N({len(self.children) - 1})']
+        elif self.text == 'Select':
+            assert len(self.children) == 1 and self.children[0].text == 'N'
+            act = [f'Sel(0)']
+        elif self.text == 'Filter':
+            act = [f'Filter({filter_map.index(childern_text)})']
+        elif self.text == 'Sup':
+            act = [f'Sup({sup_map.index(childern_text)})']
+        elif self.text == 'Order':
+            act = [f'Order({order_map.index(childern_text)})']
+        elif self.text == 'A':
+            act = [f'A({a_map.index(childern_text)})']
+        else:
+            #print(self.text)
+            assert self.text == 'C' or self.text == 'T'
+            if self.text == 'C':
+                act = [f'Column {"_".join([c for c in self.children])}']
+                #print([c for c in self.children], len(self.children))
+                #print(act)
+            else:
+                act = [f'Table {"_".join([c for c in self.children])}']
+                #print([c for c in self.children], len(self.children))
+                #print(act)
 
+        for child in self.children:
+            if isinstance(child, Node):
+                act += child.get_action()
+        return act
 def is_nonterminal(token):
     letter = token[0]
     if ord('A') <= ord(letter) <= ord('Z'):
@@ -321,25 +371,27 @@ def parse_sql_tree(tree_statements):
     return root, max_depth
 
 from sqlrefactor import *
-def sem2nl(sql_tree):
+def sem2nl(sql_tree, data):
 
     root, max_depth = parse_sql_tree(sql_tree)
+    sql_tree = [root]
+    #sql_tree = refactor(root, ['Filter', 'Select', 'Intersect'])
+    restatement = [root.restatement_with_tag()[0] for root in sql_tree]
 
-    sql_tree = refactor(root, ['Filter', 'Select', 'Intersect'])
-    #sql_tree = refactor(root, ['Intersect'])
-    #assert len(sql_tree) >= 1
-    #return len(sql_tree) > 1
-    #if len(sql_tree) > 1:
-    #    pass
-        #for root in sql_tree:
-        #    print(root.restatement_with_tag())
-        #print('*'*80)
-    #print(sql_tree)
-    #restatement = sql_tree[0].restatement_with_tag()
-    #print(restatement[0])
-    #exit(0)
-    restatement = [root.restatement_with_tag() for root in sql_tree]
-    return restatement
+    def get_id(l):
+        for i, s in enumerate(l):
+            if s.startswith('Column'):
+                column_name = s.split()[1].replace('_', ' ')
+                s = f'C({data["col_set"].index(column_name)})'
+            elif s.startswith('Table'):
+                table_name = s.split()[1].replace('_', ' ')
+                s = f'T({data["table_names"].index(table_name)})'
+            l[i] = s
+        return l
+
+    rule_action = [get_id(root.get_action()) for root in sql_tree]
+
+    return restatement, rule_action
     #print(restatement[0])
 
 
@@ -363,6 +415,7 @@ if __name__ == '__main__':
         'Root1': 'Statement', 'Root': 'Root', 'Sel': 'Select', 'N': 'N', 'A': 'A',
         'C': 'C', 'T': 'T', 'Filter': 'Filter', 'Sup': 'Sup', 'Order': 'Order',
     }
+    reversed_map = {v: k for k, v in nt_map.items()}
     #with open('./data/train_spider.json') as f:
     #    data = json.load(f)
     with open('./data/train.json') as f:
@@ -380,7 +433,7 @@ if __name__ == '__main__':
         question = d['question']
         db_id = d['db_id']
         db = table[db_id]
-
+        #print(rules)
         actions = []
         for rule in rules.split():
             nt = rule.split('(')[0]
@@ -395,11 +448,62 @@ if __name__ == '__main__':
             elif nt == 'T':
                 prod = f'{nt} -> {d["table_names"][obj.id_c]}'
             actions.append(prod)
+        #print(rules)
+        #print(d['col_set'])
+        #print(d['table_names'])
+        #print(d['query'], d['question'])
+        r1 = rules
+
+        r2 = ' '.join(sem2nl(actions, d)[1][0])
+        if r1 != r2:
+            print(i)
+            print(r1, r2)
+            exit(0)
+        #print(d['query'], d['question'])
+        #print(sem2nl(actions, d))
+        #print('*' * 80)
+        #exit(0)
         #if sem2nl(actions):
         #    total += 1
         #print(i, total)
-        #d['generate'] = sem2nl(actions)
-        tmp = sem2nl(actions)
+        '''
+        d['generate'] = sem2nl(actions)
+
+        print(actions)
+        print(d['generate'][1])
+        for generate in d['generate'][1]:
+            ans = []
+            flag = False
+            i = 1
+            while i < len(generate):
+                x = generate[i]
+                if x == 'A':
+                    y = generate[i + 1]
+                    tmp_map = {'none': 0, 'max':1, 'min': 2, 'count': 3, 'sum': 4, 'avg': 5}
+                    id = tmp_map[y]
+                    ans.append(f'A({id})')
+                    i += 2
+                elif x == 'C':
+                    y = generate[i + 1]
+                    id = d['col_set'].index(y)
+                    ans.append(f'C({id})')
+                    i += 2
+                elif x == 'T':
+                    y = generate[i + 1]
+                    id = d['table_names'].index(y)
+                    ans.append(f'T({id})')
+                    i += 2
+                elif x == 'Filter':
+                    tmp_map =
+                elif x == 'Statement':
+
+
+
+
+        exit(0)
+        '''
+        #tmp = sem2nl(actions)
+        '''
         data = []
         for nl in tmp:
             question = nl[0]
@@ -411,6 +515,8 @@ if __name__ == '__main__':
         with open('new_train.json', 'w') as f:
             json.dump(data, f)
         exit(0)
+        '''
+    exit(0)
     data = list(filter(lambda x: 'generate' in x.keys(), data))
     import pickle
     with open('generate_data.pkl', 'wb') as f:
