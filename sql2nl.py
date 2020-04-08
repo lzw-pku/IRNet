@@ -291,6 +291,8 @@ class Node:
         sup_map = order_map = ['des A', 'asc A']
         a_map = ['none C T', 'max C T', 'min C T', 'count C T',
                  'sum C T', 'avg C T']
+        #if self.text == 'Statement':
+        #    print([c.text if isinstance(c, Node) else c for c in self.children])
         childern_text = ' '.join([c.text if isinstance(c, Node) else c for c in self.children])
         if self.text == 'SQL':
             act = []
@@ -370,14 +372,86 @@ def parse_sql_tree(tree_statements):
                 break
     return root, max_depth
 
-from sqlrefactor import *
+
+
+
+from copy import deepcopy
+import re
+def refactor(node, mode):
+    print(node.text)
+    sql_tree_list = []
+    child_list = []
+    for child in node.children:
+        if isinstance(child, Node):
+            child_list.append(refactor(child, mode))
+        else:
+            child_list.append([child])
+    def dfs(child_list):
+        if len(child_list) == 1:
+            return [[c] for c in child_list[0]]
+        ret = []
+        tmp = dfs(child_list[1:])
+        for child in child_list[0]:
+            ret += [[child] + c for c in tmp]
+        return ret
+
+    tmp = dfs(child_list)
+    for child in tmp:
+        new_node = deepcopy(node)
+        new_node.children = deepcopy(child)
+        sql_tree_list.append(new_node)
+
+    if 'Filter' in mode and \
+            (node.statement == 'and Filter Filter' or node.statement == 'or Filter Filter'):
+        assert len(node.children) == 3 and (node.children[0] == 'and' or node.children[0] == 'or')
+        assert len(child_list[0]) == 1 and (child_list[0][0] == 'and' or child_list[0][0] == 'or')
+        for child1 in child_list[1]:
+            for child2 in child_list[2]:
+                new_node = deepcopy(node)
+                new_node.children = deepcopy([child_list[0][0], child2, child1])
+                sql_tree_list.append(new_node)
+
+    if 'Intersect' in mode and node.statement == 'intersect Root Root':
+        assert len(node.children) == 3 and node.children[0] == 'intersect'
+        assert len(child_list[0]) == 1 and child_list[0][0] == 'intersect'
+        for child1 in child_list[1]:
+            for child2 in child_list[2]:
+                new_node = deepcopy(node)
+                new_node.children = deepcopy(['intersect', child2, child1])
+                sql_tree_list.append(new_node)
+
+    if 'Select' in mode and re.match('A( A)*', node.statement) != None:
+        assert all([len(c) == 1 for c in child_list])
+        for i in range(1, len(child_list)):
+            new_node = deepcopy(node)
+            new_node.children = deepcopy([c[0] for c in child_list[i:] + child_list[:i]])
+            sql_tree_list.append(new_node)
+
+    return sql_tree_list
+
+
+def mutate_select(sql):
+    state = sql.children[0]
+    if len(state.children) > 1:
+        return False
+    root = state.children[0]
+    sel = root.children[0]
+    n = sel.children[0]
+    if len(n.children) == 1:
+        return False
+    return True
+    # schema link
+
+
 def sem2nl(sql_tree, data):
 
     root, max_depth = parse_sql_tree(sql_tree)
-    sql_tree = [root]
+    #sql_tree = [root]
     #sql_tree = refactor(root, ['Filter', 'Select', 'Intersect'])
-    restatement = [root.restatement_with_tag()[0] for root in sql_tree]
 
+    #restatement = [root.restatement_with_tag()[0] for root in sql_tree]
+    #exit(0)
+    return mutate_select(root)
     def get_id(l):
         for i, s in enumerate(l):
             if s.startswith('Column'):
@@ -425,6 +499,7 @@ if __name__ == '__main__':
     table = {t['db_id']: t for t in table}
     total = 0
     for i, d in enumerate(data):
+        #print(i)
         if 'JOIN' in d['query']:continue
         #total += 1
         #print(i, total)
@@ -435,9 +510,15 @@ if __name__ == '__main__':
         db = table[db_id]
         #print(rules)
         actions = []
+        flag = False
         for rule in rules.split():
             nt = rule.split('(')[0]
-            obj = eval(rule)
+            try:
+                obj = eval(rule)
+            except:
+                #print(rules)
+                flag = True
+                break
             prod = obj.production
             prod = [nt_map[p] if p in nt_map.keys() else p for p in prod.split()[1:]]
             prod = f'{nt_map[nt]} -> {" ".join(prod)}'
@@ -448,74 +529,24 @@ if __name__ == '__main__':
             elif nt == 'T':
                 prod = f'{nt} -> {d["table_names"][obj.id_c]}'
             actions.append(prod)
+        if flag:continue
         #print(rules)
         #print(d['col_set'])
         #print(d['table_names'])
         #print(d['query'], d['question'])
+        if sem2nl(actions, d):
+            print(d['question'], d['query'])
+            total += 1
+        '''
         r1 = rules
-
         r2 = ' '.join(sem2nl(actions, d)[1][0])
         if r1 != r2:
             print(i)
             print(r1, r2)
             exit(0)
-        #print(d['query'], d['question'])
-        #print(sem2nl(actions, d))
-        #print('*' * 80)
-        #exit(0)
-        #if sem2nl(actions):
-        #    total += 1
-        #print(i, total)
         '''
-        d['generate'] = sem2nl(actions)
+    print(total)
 
-        print(actions)
-        print(d['generate'][1])
-        for generate in d['generate'][1]:
-            ans = []
-            flag = False
-            i = 1
-            while i < len(generate):
-                x = generate[i]
-                if x == 'A':
-                    y = generate[i + 1]
-                    tmp_map = {'none': 0, 'max':1, 'min': 2, 'count': 3, 'sum': 4, 'avg': 5}
-                    id = tmp_map[y]
-                    ans.append(f'A({id})')
-                    i += 2
-                elif x == 'C':
-                    y = generate[i + 1]
-                    id = d['col_set'].index(y)
-                    ans.append(f'C({id})')
-                    i += 2
-                elif x == 'T':
-                    y = generate[i + 1]
-                    id = d['table_names'].index(y)
-                    ans.append(f'T({id})')
-                    i += 2
-                elif x == 'Filter':
-                    tmp_map =
-                elif x == 'Statement':
-
-
-
-
-        exit(0)
-        '''
-        #tmp = sem2nl(actions)
-        '''
-        data = []
-        for nl in tmp:
-            question = nl[0]
-            question_toks = nl[0].split()
-            d = {'question': question, 'question_toks': question_toks, 'db_id': d['db_id'],
-                 'query': d['query'], 'query_toks': d['query_toks'], 'query_toks_no_value': d['query_toks_no_value'],
-                 'sql': d['sql']}
-            data.append(d)
-        with open('new_train.json', 'w') as f:
-            json.dump(data, f)
-        exit(0)
-        '''
     exit(0)
     data = list(filter(lambda x: 'generate' in x.keys(), data))
     import pickle
