@@ -378,7 +378,7 @@ def parse_sql_tree(tree_statements):
 from copy import deepcopy
 import re
 def refactor(node, mode):
-    #print(node.text)
+    print(node.text)
     sql_tree_list = []
     child_list = []
     for child in node.children:
@@ -447,10 +447,11 @@ def sem2nl(sql_tree, data):
 
     root, max_depth = parse_sql_tree(sql_tree)
     #sql_tree = [root]
-    sql_tree = refactor(root, ['Filter', 'Select', 'Intersect'])
+    #sql_tree = refactor(root, ['Filter', 'Select', 'Intersect'])
 
-    restatement = [root.restatement_with_tag()[0] for root in sql_tree]
+    #restatement = [root.restatement_with_tag()[0] for root in sql_tree]
     #exit(0)
+    return mutate_select(root)
     def get_id(l):
         for i, s in enumerate(l):
             if s.startswith('Column'):
@@ -491,15 +492,14 @@ if __name__ == '__main__':
     reversed_map = {v: k for k, v in nt_map.items()}
     #with open('./data/train_spider.json') as f:
     #    data = json.load(f)
-    with open('./data/dev.json') as f:
+    with open('./data/train.json') as f:
         data = json.load(f)
     with open('./data/tables.json') as f:
         table = json.load(f)
     table = {t['db_id']: t for t in table}
     total = 0
-    new_data = []
     for i, d in enumerate(data):
-        print(i)
+        #print(i)
         if 'JOIN' in d['query']:continue
         #total += 1
         #print(i, total)
@@ -534,14 +534,9 @@ if __name__ == '__main__':
         #print(d['col_set'])
         #print(d['table_names'])
         #print(d['query'], d['question'])
-        #if sem2nl(actions, d):
-        #    print(d['question'], d['query'])
-        #    total += 1
-        tmp = sem2nl(actions, d)
-        d['mutate'] = (tmp[0], [' '.join(t) for t in tmp[1]])
-        print( d['mutate'][1])
-        new_data.append(d)
-        #exit(0)
+        if sem2nl(actions, d):
+            print(d['question'], d['query'])
+            total += 1
         '''
         r1 = rules
         r2 = ' '.join(sem2nl(actions, d)[1][0])
@@ -550,10 +545,7 @@ if __name__ == '__main__':
             print(r1, r2)
             exit(0)
         '''
-    with open('new_data.pkl', 'wb') as f:
-        import pickle
-        pickle.dump(new_data, f)
-    #print(total)
+    print(total)
 
     exit(0)
     data = list(filter(lambda x: 'generate' in x.keys(), data))
