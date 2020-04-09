@@ -475,6 +475,8 @@ def to_batch_seq(sql_data, table_data, idxes, st, ed, schemas,
             # print(col_labels)
 
         else:
+            print('Fuck!!!!')
+            print(sql)
             col_labels = sql['col_pred'][:len(ground_col_labels) + 1]
 
         col_set_iter_remove = [col_set_iter[x] for x in sorted(col_labels)]
