@@ -9221,7 +9221,7 @@
             ],
             [
                 1,
-                "student id"
+                "stuid"
             ],
             [
                 1,
@@ -9229,7 +9229,7 @@
             ],
             [
                 2,
-                "student id"
+                "stuid"
             ],
             [
                 2,
@@ -39835,327 +39835,327 @@
             ],
             [
                 0,
-                "circuit id"
-            ],
-            [
-                0,
-                "circuit reference"
-            ],
-            [
-                0,
-                "name"
-            ],
-            [
-                0,
-                "location"
-            ],
-            [
-                0,
-                "country"
-            ],
-            [
-                0,
-                "latitude"
-            ],
-            [
-                0,
-                "longitude"
-            ],
-            [
-                0,
-                "altitude"
-            ],
-            [
-                0,
-                "url"
-            ],
-            [
-                1,
                 "race id"
             ],
             [
-                1,
+                0,
                 "year"
             ],
             [
-                1,
+                0,
                 "round"
             ],
             [
-                1,
+                0,
                 "circuit id"
             ],
             [
-                1,
+                0,
                 "name"
             ],
             [
-                1,
+                0,
                 "date"
             ],
             [
-                1,
+                0,
                 "time"
             ],
             [
-                1,
+                0,
                 "url"
             ],
             [
-                2,
+                1,
                 "driver id"
             ],
             [
-                2,
+                1,
                 "driver reference"
             ],
             [
-                2,
+                1,
                 "number"
             ],
             [
-                2,
+                1,
                 "code"
             ],
             [
-                2,
+                1,
                 "forename"
             ],
             [
-                2,
+                1,
                 "surname"
             ],
             [
-                2,
+                1,
                 "dob"
             ],
             [
-                2,
+                1,
                 "nationality"
             ],
             [
-                2,
+                1,
                 "url"
             ],
             [
-                3,
+                2,
                 "status id"
             ],
             [
-                3,
+                2,
                 "status"
             ],
             [
-                4,
+                3,
                 "year"
             ],
             [
+                3,
+                "url"
+            ],
+            [
+                4,
+                "constructor id"
+            ],
+            [
+                4,
+                "constructor reference"
+            ],
+            [
+                4,
+                "name"
+            ],
+            [
+                4,
+                "nationality"
+            ],
+            [
                 4,
                 "url"
             ],
             [
                 5,
-                "constructor id"
-            ],
-            [
-                5,
-                "constructor reference"
-            ],
-            [
-                5,
-                "name"
-            ],
-            [
-                5,
-                "nationality"
-            ],
-            [
-                5,
-                "url"
-            ],
-            [
-                6,
                 "constructor standings id"
             ],
             [
-                6,
+                5,
                 "race id"
             ],
             [
-                6,
+                5,
                 "constructor id"
             ],
             [
-                6,
+                5,
                 "points"
             ],
             [
-                6,
+                5,
                 "position"
             ],
             [
-                6,
+                5,
                 "position text"
             ],
             [
-                6,
+                5,
                 "wins"
             ],
             [
-                7,
+                6,
                 "result id"
             ],
             [
-                7,
+                6,
                 "race id"
             ],
             [
-                7,
+                6,
                 "driver id"
             ],
             [
-                7,
+                6,
                 "constructor id"
             ],
             [
-                7,
+                6,
                 "number"
             ],
             [
-                7,
+                6,
                 "grid"
             ],
             [
-                7,
+                6,
                 "position"
             ],
             [
-                7,
+                6,
                 "position text"
             ],
             [
-                7,
+                6,
                 "position order"
             ],
             [
-                7,
+                6,
                 "points"
             ],
             [
-                7,
+                6,
                 "laps"
             ],
             [
-                7,
+                6,
                 "time"
             ],
             [
-                7,
+                6,
                 "milliseconds"
             ],
             [
-                7,
+                6,
                 "fastest lap"
             ],
             [
-                7,
+                6,
                 "rank"
             ],
             [
-                7,
+                6,
                 "fastest lap time"
             ],
             [
-                7,
+                6,
                 "fastest lap speed"
             ],
             [
-                7,
+                6,
                 "status id"
             ],
             [
-                8,
+                7,
                 "driver standings id"
             ],
             [
-                8,
+                7,
                 "race id"
             ],
             [
-                8,
+                7,
                 "driver id"
             ],
             [
-                8,
+                7,
                 "points"
             ],
             [
-                8,
+                7,
                 "position"
             ],
             [
-                8,
+                7,
                 "position text"
             ],
             [
-                8,
+                7,
                 "wins"
             ],
             [
-                9,
+                8,
                 "constructor results id"
             ],
             [
-                9,
+                8,
                 "race id"
             ],
             [
-                9,
+                8,
                 "constructor id"
             ],
             [
-                9,
+                8,
                 "points"
             ],
             [
-                9,
+                8,
                 "status"
             ],
             [
-                10,
+                9,
                 "qualify id"
             ],
             [
-                10,
+                9,
                 "race id"
             ],
             [
-                10,
+                9,
                 "driver id"
             ],
             [
-                10,
+                9,
                 "constructor id"
             ],
             [
-                10,
+                9,
                 "number"
             ],
             [
-                10,
+                9,
                 "position"
             ],
             [
-                10,
+                9,
                 "q1"
             ],
             [
-                10,
+                9,
                 "q2"
             ],
             [
-                10,
+                9,
                 "q3"
+            ],
+            [
+                10,
+                "circuit id"
+            ],
+            [
+                10,
+                "circuit reference"
+            ],
+            [
+                10,
+                "name"
+            ],
+            [
+                10,
+                "location"
+            ],
+            [
+                10,
+                "country"
+            ],
+            [
+                10,
+                "latitude"
+            ],
+            [
+                10,
+                "longitude"
+            ],
+            [
+                10,
+                "altitude"
+            ],
+            [
+                10,
+                "url"
             ],
             [
                 11,
@@ -40776,7 +40776,6 @@
             89
         ],
         "table_names": [
-            "circuits",
             "races",
             "drivers",
             "status",
@@ -40787,6 +40786,7 @@
             "driver standings",
             "constructor results",
             "qualifying",
+            "circuits",
             "pitstops",
             "laptimes"
         ],

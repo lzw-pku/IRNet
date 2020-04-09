@@ -7,20 +7,13 @@ print(data[0])
 exit(0)
 '''
 '''
-import pickle
+import json
 import copy
-with open('new_data.pkl', 'rb') as f:
-    data = pickle.load(f)
+with open('generate_data.json') as f:
+    data = json.load(f)
 new_data = []
 # ['db_id', 'query', 'query_toks', 'query_toks_no_value', 'question', 'question_toks', 'sql']
 for d in data:
-    #print(d['question'])
-    #print(d['rule_label'])
-    #print(d['mutate'])
-    #exit(0)
-    #print(d.keys())
-    #print(d['query_toks'], d['query_toks_no_value'], d['question_toks'], d['question'])
-    #exit(0)
     mutate = d['mutate']
     for q, a in zip(mutate[0], mutate[1]):
         new_d =  {'db_id': d['db_id'],
@@ -43,15 +36,20 @@ with open('new_data.json', 'w') as f:
     exit(0)
 '''
 import json
-with open('data/train_spider.json') as f:
+with open('data/dev.json') as f:
     data = json.load(f)
     print(data[0].keys())
-with open('preprocess/process.json') as f:
-    data = json.load(f)
+    print(len(data))
+exit(0)
+import pickle
+with open('new_data.pkl', 'rb') as f:
+    data = pickle.load(f)
     print(data[0].keys())
+    print(len(data))
 with open('preprocess/output.json') as f:
     data = json.load(f)
     print(data[0].keys())
+    print(len(data))
     exit(0)
 with open('data/train.json') as f:
     data = json.load(f)

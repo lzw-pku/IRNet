@@ -529,7 +529,8 @@ if __name__ == '__main__':
             elif nt == 'T':
                 prod = f'{nt} -> {d["table_names"][obj.id_c]}'
             actions.append(prod)
-        if flag:continue
+        if flag:
+            continue
         #print(rules)
         #print(d['col_set'])
         #print(d['table_names'])
@@ -539,7 +540,7 @@ if __name__ == '__main__':
         #    total += 1
         tmp = sem2nl(actions, d)
         d['mutate'] = (tmp[0], [' '.join(t) for t in tmp[1]])
-        print( d['mutate'][1])
+        #print( d['mutate'][1])
         new_data.append(d)
         #exit(0)
         '''
@@ -550,9 +551,9 @@ if __name__ == '__main__':
             print(r1, r2)
             exit(0)
         '''
-    with open('new_data.pkl', 'wb') as f:
-        import pickle
-        pickle.dump(new_data, f)
+    with open('generate_data.json', 'w') as f:
+        import json
+        json.dump(new_data, f)
     #print(total)
 
     exit(0)
